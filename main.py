@@ -1,16 +1,11 @@
-import warnings
 from fastapi import Depends, FastAPI, HTTPException, Response,status,Header
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, StreamingResponse, JSONResponse
 import uvicorn
-from sqlalchemy.orm import Session
 from database import SessionLocal, get_db
 from fastapi.middleware.cors import CORSMiddleware
 from routers.NewsFeed import newsfeed
 from routers.Videos import videos
 from routers.Users import users
-from pathlib import Path
-import os
-import cv2
 app = FastAPI()
 app.include_router(newsfeed.router)
 app.include_router(videos.router)
