@@ -15,3 +15,4 @@ uvicorn==0.23.2
 watchfiles==0.18.1
 websockets==10.4
 psycopg2-binary
+sqlalchemy
