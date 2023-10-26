@@ -20,5 +20,3 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-if __name__=='__main__':
-    uvicorn.run(app=app,host='192.168.18.84',port=7000)
