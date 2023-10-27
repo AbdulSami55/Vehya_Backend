@@ -16,3 +16,4 @@ watchfiles==0.18.1
 websockets==10.4
 psycopg2-binary
 sqlalchemy
+python-multipart
