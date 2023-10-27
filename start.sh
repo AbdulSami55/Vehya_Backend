@@ -2,4 +2,4 @@
 
 cd "$(dirname "$0")"
 source env/bin/activate
-uvicorn main:app --uds=/tmp/uvicorn.sock
+uvicorn main:app --host=0.0.0.0 --workers=4 
