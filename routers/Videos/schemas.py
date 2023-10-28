@@ -1,13 +1,15 @@
 from pydantic import BaseModel
 
 class Video(BaseModel):
-    title:str
-    description:str
-    category:str
-    lat:float
-    long:float
-    location:str
+    Title:str
+    Description:str
+    Category:str
+    Lat:float
+    Long:float
+    Location:str
 
 class CompleteVideo(Video):
-    video:str
+    Video:str
     
+class UpdateVideo(CompleteVideo):
+    Id:int    

@@ -18,8 +18,8 @@ async def addVideo(video:schemas.CompleteVideo=Depends(), db: Session = Depends(
     try:
         
         
-        Video = schemas.CompleteVideo(title=video.title, description=video.description, category=video.category, video=video.video,
-                                      lat=video.lat, long=video.long, location=video.location)
+        Video = schemas.CompleteVideo(Title=video.Title, Description=video.Description, Category=video.Category, Video=video.Video,
+                                      Lat=video.Lat, Long=video.Long, Location=video.Location)
         return crud.addVideo(db=db,video=Video)
         
     except:
@@ -45,6 +45,56 @@ async def getVideoMetadata(VideoId:int,db:Session= Depends(get_db)):
     except:
         return HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR) 
     
+@router.get('/Get-Map-Videos')
+async def getMapVideos(db:Session= Depends(get_db)):
+    try:
+        Videos = db.query(models.Videos).offset(0).limit(100000).all()
+        VideosList=[]
+        for Video in Videos:
+            singleVid = {
+                            'id': Video.id,
+                            'position': {
+                                    'lat': Video.Lat, 
+                                    'lng': Video.Long, 
+                                         },
+                            'UserDetail': {
+                                            'Category':Video.Category,
+                                            'VideoLink':Video.Video,
+                                            'VideoTitle':Video.Title,
+                                            'VideoDescription':Video.Description
+                                            }
+                        }
+            VideosList.append(singleVid)
+        return VideosList
+
+    except:
+        return HTTPException(detail='Something went wrong',status_code=status.WS_1011_INTERNAL_ERROR) 
+
+@router.put('/Update-Video')
+async def UpdateVideo(video:schemas.UpdateVideo,db:Session= Depends(get_db)):
+    try:
+        update_video={  "id": video.Id,
+                        "Title":video.Title,
+                        "Description":video.Description,
+                        "Category": video.Category,
+                        "Video":video.Video,
+                        "Lat":video.Lat,
+                        "Long":video.Long,
+                        "Location":video.Location}
+        UpdatedVideo = db.query(models.Videos).filter(models.Videos.id==video.Id)
+        UpdatedVideo.update(update_video)
+        db.commit()
+        return {'Message':'Successfully Updated Article'}
+    except:
+        return HTTPException(detail='Something went wrong', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@router.delete('/Delete-Video')
+async def DeleteVideo(VideoId:int,db:Session= Depends(get_db) ):
+    try:
+        return crud.deleteVideo(db=db, Id=VideoId)
+    except:
+        return HTTPException(detail='Something went wrong', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 # @router.get('/Get-Video-Stream')
 # async def getVideoStreamResponse(VideoId:int,db:Session= Depends(get_db)):

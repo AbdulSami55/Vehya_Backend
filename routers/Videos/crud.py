@@ -59,15 +59,24 @@ import shutil
 
 def addVideo(db:Session, video:schemas.CompleteVideo):
     try:
-        Video= models.Videos(Title=video.title, Description=video.description, Category=video.category,  
-                              Video=video.video, Lat=video.lat, Long=video.long, Location=video.location )
+        Video= models.Videos(Title=video.Title, Description=video.Description, Category=video.Category,  
+                              Video=video.Video, Lat=video.Lat, Long=video.Long, Location=video.Location )
         db.add(Video)
         db.commit()
         db.refresh(Video)
         return "Data Uploaded"
     except:
         return HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
+def deleteVideo(db:Session, Id:int):
+    try:
+        Video= db.query(models.Videos).filter(models.Videos.id==Id)
+        Video.delete(synchronize_session=False)
+        db.commit()
+        return "Video Deleted Successfully"
+    except:
+        return HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 # def getVideoStream(path:str):
 #     video_path = path  # Replace with the actual path to your video file

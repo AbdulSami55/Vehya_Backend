@@ -1,10 +1,14 @@
+from typing import Optional
 from pydantic import BaseModel
 
 class NewsFeed(BaseModel):
-    title:str
-    description:str
-    category:str
+    Title:str
+    Description:str
+    Category:str
 
 class CompleteNewsFeed(NewsFeed):
-    image:str
+    Image:str
 
+class UpdateNewsFeed(NewsFeed):
+    Id:int
+    # image:Optional[str]

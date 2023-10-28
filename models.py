@@ -30,3 +30,9 @@ class Videos(Base):
     Lat = Column(Float, default=0.0)
     Long = Column(Float, default=0.0)
     Location=Column(String)
+
+class FeaturedProducts(Base):
+    __tablename__ = "featured_products"
+    id = Column(Integer, primary_key=True, index=True)
+    ProductID = Column(Integer)
+    PageName = Column(String)
