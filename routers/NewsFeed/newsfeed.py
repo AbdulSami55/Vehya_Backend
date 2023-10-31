@@ -233,13 +233,9 @@ async def deleteArticle(ArticleID:int, db:Session = Depends(get_db)):
 
 
 @router.get('/Send-File-Response')
-async def SendImageFile(FilePath:str ):
+async def SendImageFile(FilePath:str):
     try:
-        if os.path.isfile(FilePath):
-            return FileResponse(FilePath, media_type="application/octet-stream")
-        else:
-            return HTTPException(detail='File Path Invalid',status_code=status.HTTP_404_NOT_FOUND)
-
+        return FileResponse(FilePath)
     except:
         return HTTPException(detail='Something went wrong', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
