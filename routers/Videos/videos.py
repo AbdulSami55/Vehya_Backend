@@ -45,6 +45,25 @@ async def getVideoMetadata(VideoId:int,db:Session= Depends(get_db)):
     except:
         return HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR) 
     
+@router.get('/Get-Video-MetaData-By-ID')
+async def getVideoMetadataByID(VideoId:int,db:Session= Depends(get_db)):
+    try:
+        video = db.query(models.Videos).filter(models.Videos.id==VideoId).first()
+        if video:
+            return{
+                'Title':video.Title,
+                'Description':video.Description,
+                'Category':video.Category,
+                'Video':video.Video,
+                'Lat':video.Lat,
+                'Long':video.Long,
+                'Location':video.Location
+            }
+        else:
+            return {'Message':'No such data exists in database'}
+    except:
+        return HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+    
 @router.get('/Get-Map-Videos')
 async def getMapVideos(db:Session= Depends(get_db)):
     try:

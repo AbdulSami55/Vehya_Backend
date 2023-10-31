@@ -43,6 +43,18 @@ async def get_news_by_id(NewsID:int, db:Session = Depends(get_db)):
 async def get_news_article(PageNo:int,db:Session = Depends(get_db) ):
     return crud.getNewsArticle(db=db, PageNo=PageNo)
 
+@router.get('/Get-All-Articles')
+async def get_news_article(db:Session = Depends(get_db) ):
+    try:
+        news = db.query(models.NewsFeed).all()
+        if news:
+            return news, {'TotalRows':len(news)}
+        else:
+            return {'Message':'No data exists'}
+    except:
+        return HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+    
+
 @router.get('/Get-Article-Charging-Resiliency')
 async def get_news_article_CR(db:Session = Depends(get_db) ):
     try:
@@ -224,7 +236,7 @@ async def deleteArticle(ArticleID:int, db:Session = Depends(get_db)):
 async def SendImageFile(FilePath:str ):
     try:
         if os.path.isfile(FilePath):
-            return FileResponse(FilePath)
+            return FileResponse(FilePath, media_type="application/octet-stream")
         else:
             return HTTPException(detail='File Path Invalid',status_code=status.HTTP_404_NOT_FOUND)
 
