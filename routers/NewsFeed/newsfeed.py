@@ -224,7 +224,7 @@ async def deleteArticle(ArticleID:int, db:Session = Depends(get_db)):
 async def SendImageFile(FilePath:str ):
     try:
         if os.path.isfile(FilePath):
-            return FileResponse(FilePath, media_type="application/octet-stream")
+            return FileResponse(FilePath)
         else:
             return HTTPException(detail='File Path Invalid',status_code=status.HTTP_404_NOT_FOUND)
 
