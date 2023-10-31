@@ -5,6 +5,7 @@ import datetime
 import os
 from fastapi import status
 from sqlalchemy.orm import Session
+import math
 
 def upload_image_file(file,news:schemas.NewsFeed):
     file_extension = file.filename.split(".")[-1]
@@ -73,6 +74,19 @@ def addNews(db:Session, news:schemas.CompleteNewsFeed):
         return "Data Uploaded"
     except:
         return HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
+def writeHTMLfile(data:str):
+    # try:
+        path='Static/Files/NewsFeed/HTML_Files'
+        current_time=datetime.datetime.now()
+        current_time = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+        file_path = f"{path}/{current_time}_.html"
+        with open(file_path, "w") as file:
+            file.write(data)
+        return file_path
+    # except:
+    #     return HTTPException(detail='Something went wrong while writing HTML content',status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def getNews(db:Session, id:int):
     try:
@@ -95,6 +109,12 @@ def getNewsArticle(db:Session, PageNo:int):
     start_index = (end_index-6)
     total_rows = db.query(models.NewsFeed).count()
     total_pages = (total_rows / 6 )
+    if total_pages % 1 > 0:
+        # Round up to the next whole number
+        total_pages_rounded = math.ceil(total_pages)
+    else:
+        # It's already a whole number
+        total_pages_rounded = int(total_pages)
     Pages=list(range(1, int(total_pages)+2 ))
     if (end_index>total_rows):
         end_index=total_rows
@@ -114,8 +134,8 @@ def getNewsArticle(db:Session, PageNo:int):
     return {'PageNo':PageNo,
             'NewsArticles':NewsArticles,
             'Key':key,
-            'TotalPages':int(total_pages),
-            'Pages':Pages
+            'TotalPages':total_pages_rounded,
+            'TotalData':total_rows
             }    
 
 
@@ -124,6 +144,13 @@ def getServicePROArticle(db:Session, PageNo:int):
     start_index = (end_index-6)
     total_rows = db.query(models.NewsFeed).filter(models.NewsFeed.Category=='Service PROs').count()
     total_pages = (total_rows / 6 )
+    if total_pages % 1 > 0:
+        # Round up to the next whole number
+        total_pages_rounded = math.ceil(total_pages)
+    else:
+        # It's already a whole number
+        total_pages_rounded = int(total_pages)
+
     Pages=list(range(1, int(total_pages)+1 ))
     if (end_index>total_rows):
         end_index=total_rows
@@ -143,9 +170,10 @@ def getServicePROArticle(db:Session, PageNo:int):
     return {'PageNo':PageNo,
             'NewsArticles':NewsArticles,
             # 'Key':key,
-            'TotalPages':int(total_pages),
-            'Pages':Pages
+            'TotalPages':total_pages_rounded,
+            'TotalRows':total_rows
             }    
+
 def getChargingArticle(db:Session, PageNo:int):
     end_index = PageNo*6
     start_index = (end_index-6)

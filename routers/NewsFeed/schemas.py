@@ -9,6 +9,8 @@ class NewsFeed(BaseModel):
 class CompleteNewsFeed(NewsFeed):
     Image:str
 
-class UpdateNewsFeed(NewsFeed):
+class UpdateNewsFeed(BaseModel):
     Id:int
-    # image:Optional[str]
+    Title:str
+    Description:Optional[str]
+    Category:str

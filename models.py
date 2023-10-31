@@ -34,5 +34,5 @@ class Videos(Base):
 class FeaturedProducts(Base):
     __tablename__ = "featured_products"
     id = Column(Integer, primary_key=True, index=True)
-    ProductID = Column(Integer)
-    PageName = Column(String)
+    ProductID = Column(String)
+    Category = Column(String)
