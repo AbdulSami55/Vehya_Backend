@@ -16,6 +16,7 @@ class NewsFeed(Base):
     id = Column(Integer, primary_key=True, index=True)
     Title=Column(String)
     Description=Column(String)
+    ShortDescription=Column(String)
     Category=Column(String)
     Image=Column(String)
 

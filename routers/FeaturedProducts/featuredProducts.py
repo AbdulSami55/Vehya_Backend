@@ -53,7 +53,7 @@ def DeleteFeaturedProduct(Id:int,db: Session = Depends(get_db)):
 @router.get('/Get-Featured_product')    
 async def getFeaturedProduct(db: Session = Depends(get_db)):
     try:
-        # end_index = 1000000000
+        
         total_rows = db.query(models.FeaturedProducts).count()
         Products =  db.query(models.FeaturedProducts).slice(start=0, stop=total_rows).all()
         return {'Products':Products,
@@ -66,7 +66,7 @@ async def getFeaturedProduct(db: Session = Depends(get_db)):
 @router.get('/Get-Featured_product-By-Category')    
 async def getFeaturedProductbyCategory(Category:str,db: Session = Depends(get_db)):
     try:
-        # end_index = 1000000000
+        
         Product =  db.query(models.FeaturedProducts).filter(models.FeaturedProducts.Category==Category).first()
         
     

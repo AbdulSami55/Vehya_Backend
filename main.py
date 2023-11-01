@@ -1,9 +1,11 @@
 from fastapi import FastAPI
+import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 from routers.NewsFeed import newsfeed
 from routers.Videos import videos
 from routers.Users import users
 from routers.FeaturedProducts import featuredProducts
+
 
 app = FastAPI()
 app.include_router(newsfeed.router)
@@ -23,5 +25,3 @@ app.add_middleware(
 @app.get('/health')
 def get_health():
     return {"status":"OK","code":200}
-
-

@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class NewsFeed(BaseModel):
     Title:str
     Description:str
+    ShortDescription:str
     Category:str
 
 class CompleteNewsFeed(NewsFeed):
@@ -13,4 +14,5 @@ class UpdateNewsFeed(BaseModel):
     Id:int
     Title:str
     Description:Optional[str]
+    ShortDescription:str
     Category:str

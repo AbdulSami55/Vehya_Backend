@@ -20,7 +20,35 @@ def upload_image_file(file,news:schemas.NewsFeed):
             file_path=f'Static/Files/NewsFeed/{news.Category}/Images'
             if not os.path.exists(file_path):
                 os.makedirs(file_path)
-            final_file_path=f'{file_path}/{current_time}__{file.filename}'
+            # final_file_path=f'{file_path}/{current_time}__{file.filename}'
+            final_file_path=f'{file_path}/{current_time}.{file_extension}'
+            with open(final_file_path, 'wb') as f:
+                f.write(contents)
+
+        except Exception:
+            os.remove(final_file_path)
+            return HTTPException(detail="There was an error uploading the file",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        finally:
+            file.file.close()
+        return final_file_path
+    else:
+        return HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="File Type Invalid")
+    
+def upload_image_file_test(file,Category:str):
+    file_extension = file.filename.split(".")[-1]
+    allowed_extensions = ["jpg", "jpeg", "png"]
+    if file_extension.lower() in allowed_extensions:
+        
+    
+        try:
+            contents = file.file.read()
+            current_time=datetime.datetime.now()
+            current_time = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+            file_path=f'Static/Files/NewsFeed/{Category}/Images'
+            if not os.path.exists(file_path):
+                os.makedirs(file_path)
+            # final_file_path=f'{file_path}/{current_time}__{file.filename}'
+            final_file_path=f'{file_path}/{current_time}.{file_extension}'
             with open(final_file_path, 'wb') as f:
                 f.write(contents)
 
@@ -67,7 +95,7 @@ def save_updated_logo_file(new_path:str, file):
 
 def addNews(db:Session, news:schemas.CompleteNewsFeed):
     try:
-        News= models.NewsFeed(Title=news.Title, Description=news.Description, Category=news.Category, Image=news.Image)
+        News= models.NewsFeed(Title=news.Title, Description=news.Description, ShortDescription=news.ShortDescription, Category=news.Category, Image=news.Image)
         db.add(News)
         db.commit()
         db.refresh(News)
@@ -77,16 +105,22 @@ def addNews(db:Session, news:schemas.CompleteNewsFeed):
     
 
 def writeHTMLfile(data:str):
-    # try:
+    try:
         path='Static/Files/NewsFeed/HTML_Files'
-        current_time=datetime.datetime.now()
-        current_time = current_time.strftime("%Y-%m-%d_%H-%M-%S")
-        file_path = f"{path}/{current_time}_.html"
+        if os.path.exists(path=path):
+            current_time=datetime.datetime.now()
+            current_time = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+            file_path = f"{path}/{current_time}_.html"
+        else:
+            os.makedirs(path)    
+            current_time=datetime.datetime.now()
+            current_time = current_time.strftime("%Y-%m-%d_%H-%M-%S")
+            file_path = f"{path}/{current_time}_.html"
         with open(file_path, "w") as file:
             file.write(data)
         return file_path
-    # except:
-    #     return HTTPException(detail='Something went wrong while writing HTML content',status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except:
+        return HTTPException(detail='Something went wrong while writing HTML content',status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def getNews(db:Session, id:int):
     try:
@@ -95,6 +129,7 @@ def getNews(db:Session, id:int):
             return{
                 'Title':news.Title,
                 'Description':news.Description,
+                'ShortDescription':news.ShortDescription,
                 'Category':news.Category,
                 'Image':news.Image
             }
@@ -124,8 +159,6 @@ def getNewsArticle(db:Session, PageNo:int):
     articles = db.query(models.NewsFeed).slice(start=start_index, stop=end_index).all()
     for article in articles:
         NewsArticles.append(article)
-    # length=len(NewsArticles)    
-    # print(length)
     key=''
     if(len(NewsArticles)==6):
         key='continue'
@@ -159,17 +192,9 @@ def getServicePROArticle(db:Session, PageNo:int):
     NewsArticles=[]
     articles = db.query(models.NewsFeed).filter(models.NewsFeed.Category=='Service PROs').slice(start=start_index, stop=end_index).all()
     for article in articles:
-        NewsArticles.append(article)
-    # length=len(NewsArticles)    
-    # print(length)
-    key=''
-    if(len(NewsArticles)==6):
-        key='continue'
-    else:
-        key='last'        
+        NewsArticles.append(article)      
     return {'PageNo':PageNo,
             'NewsArticles':NewsArticles,
-            # 'Key':key,
             'TotalPages':total_pages_rounded,
             'TotalRows':total_rows
             }    
@@ -187,17 +212,9 @@ def getChargingArticle(db:Session, PageNo:int):
     NewsArticles=[]
     articles = db.query(models.NewsFeed).filter(models.NewsFeed.Category=='Charging').slice(start=start_index, stop=end_index).all()
     for article in articles:
-        NewsArticles.append(article)
-    # length=len(NewsArticles)    
-    # print(length)
-    key=''
-    if(len(NewsArticles)==6):
-        key='continue'
-    else:
-        key='last'        
+        NewsArticles.append(article)        
     return {'PageNo':PageNo,
             'NewsArticles':NewsArticles,
-            # 'Key':key,
             'TotalPages':int(total_pages),
             'Pages':Pages
             }    
