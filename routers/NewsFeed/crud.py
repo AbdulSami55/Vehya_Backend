@@ -156,7 +156,7 @@ def getNewsArticle(db:Session, PageNo:int):
     if(start_index>end_index):
         return HTTPException(detail='Page Does Not Exist', status_code=status.HTTP_404_NOT_FOUND)    
     NewsArticles=[]
-    articles = db.query(models.NewsFeed).slice(start=start_index, stop=end_index).all()
+    articles = db.query(models.NewsFeed).order_by(models.NewsFeed.id.desc()).slice(start=start_index, stop=end_index).all()
     for article in articles:
         NewsArticles.append(article)
     key=''
@@ -190,7 +190,7 @@ def getServicePROArticle(db:Session, PageNo:int):
     if(start_index>end_index):
         return HTTPException(detail='Page Does Not Exist', status_code=status.HTTP_404_NOT_FOUND)    
     NewsArticles=[]
-    articles = db.query(models.NewsFeed).filter(models.NewsFeed.Category=='Service PROs').slice(start=start_index, stop=end_index).all()
+    articles = db.query(models.NewsFeed).filter(models.NewsFeed.Category=='Service PROs').order_by(models.NewsFeed.id.desc()).slice(start=start_index, stop=end_index).all()
     for article in articles:
         NewsArticles.append(article)      
     return {'PageNo':PageNo,
@@ -210,7 +210,7 @@ def getChargingArticle(db:Session, PageNo:int):
     if(start_index>end_index):
         return HTTPException(detail='Page Does Not Exist', status_code=status.HTTP_404_NOT_FOUND)    
     NewsArticles=[]
-    articles = db.query(models.NewsFeed).filter(models.NewsFeed.Category=='Charging').slice(start=start_index, stop=end_index).all()
+    articles = db.query(models.NewsFeed).filter(models.NewsFeed.Category=='Charging').order_by(models.NewsFeed.id.desc()).slice(start=start_index, stop=end_index).all()
     for article in articles:
         NewsArticles.append(article)        
     return {'PageNo':PageNo,

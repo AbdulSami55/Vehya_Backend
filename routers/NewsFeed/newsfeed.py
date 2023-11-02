@@ -58,7 +58,7 @@ async def get_news_article(PageNo:int,db:Session = Depends(get_db) ):
 @router.get('/Get-All-Articles')
 async def get_news_article(db:Session = Depends(get_db) ):
     try:
-        news = db.query(models.NewsFeed).all()
+        news = db.query(models.NewsFeed).order_by(models.NewsFeed.id.desc()).all()
         if news:
             return news, {'TotalRows':len(news)}
         else:
@@ -70,8 +70,8 @@ async def get_news_article(db:Session = Depends(get_db) ):
 @router.get('/Get-Article-Charging-Resiliency')
 async def get_news_article_CR(db:Session = Depends(get_db) ):
     try:
-        charging = db.query(models.NewsFeed).filter(models.NewsFeed.Category=='Charging').limit(4).all()
-        resiliency = db.query(models.NewsFeed).filter(models.NewsFeed.Category=='Resiliency').limit(2).all()
+        charging = db.query(models.NewsFeed).filter(models.NewsFeed.Category=='Charging').order_by(models.NewsFeed.id.desc()).limit(4).all()
+        resiliency = db.query(models.NewsFeed).filter(models.NewsFeed.Category=='Resiliency').order_by(models.NewsFeed.id.desc()).limit(2).all()
         return{'Charging':charging,
                'Resiliency':resiliency}     
     except:
@@ -259,11 +259,16 @@ async def deleteArticle(ArticleID:int, db:Session = Depends(get_db)):
 
 
 @router.get('/Send-File-Response')
-async def SendImageFile(FilePath:str):
-    try:
+async def SendImageFile(FilePath:str ):
+    # try:
         return FileResponse(FilePath)
-    except:
-        return HTTPException(detail='Something went wrong', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # if os.path.isfile(FilePath):
+            # return FileResponse(FilePath, media_type="application/octet-stream")
+        # else:
+        #     return HTTPException(detail='File Path Invalid',status_code=status.HTTP_404_NOT_FOUND)
+
+    # except:
+    #     return HTTPException(detail='Something went wrong', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 @router.get('/Send-HTML-File-Response')
 async def SendHTMLfile(FilePath:str):
