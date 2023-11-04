@@ -64,8 +64,8 @@ async def getVideoMetadataByID(VideoId:int,db:Session= Depends(get_db)):
     except:
         return HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR) 
     
-@router.get('/Get-Map-Videos')
-async def getMapVideos(db:Session= Depends(get_db)):
+@router.get('/Get-Map-Videos-All')
+async def getMapVideosAll(db:Session= Depends(get_db)):
     try:
         Videos = db.query(models.Videos).offset(0).limit(100000).all()
         VideosList=[]
@@ -73,8 +73,8 @@ async def getMapVideos(db:Session= Depends(get_db)):
             singleVid = {
                             'id': Video.id,
                             'position': {
-                                    'lat': Video.Lat, 
-                                    'lng': Video.Long, 
+                                    'lat': Video.Lat,
+                                    'lng': Video.Long,
                                          },
                             'UserDetail': {
                                             'Category':Video.Category,
@@ -85,10 +85,36 @@ async def getMapVideos(db:Session= Depends(get_db)):
                         }
             VideosList.append(singleVid)
         return VideosList
-
     except:
-        return HTTPException(detail='Something went wrong',status_code=status.WS_1011_INTERNAL_ERROR) 
-
+        return HTTPException(detail='Something went wrong',status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+@router.get('/Get-Map-Videos')
+async def getMapVideos(db:Session= Depends(get_db)):
+    try:
+        CustomerVids = db.query(models.Videos).filter(models.Videos.Category=='Customers').order_by(models.Videos.id.desc()).limit(3).all()
+        ChargingVids = db.query(models.Videos).filter(models.Videos.Category=='Charging').order_by(models.Videos.id.desc()).limit(2).all()
+        Videos=ChargingVids
+        Videos.extend(CustomerVids)
+        VideosList=[]
+        for Video in Videos:
+            singleVid = {
+                            'id': Video.id,
+                            'position': {
+                                    'lat': Video.Lat,
+                                    'lng': Video.Long,
+                                         },
+                            'UserDetail': {
+                                            'Category':Video.Category,
+                                            'VideoLink':Video.Video,
+                                            'VideoTitle':Video.Title,
+                                            'VideoDescription':Video.Description
+                                            }
+                        }
+            VideosList.append(singleVid)
+        return VideosList
+    except:
+        return HTTPException(detail='Something went wrong',status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    
 @router.put('/Update-Video')
 async def UpdateVideo(video:schemas.UpdateVideo,db:Session= Depends(get_db)):
     try:
