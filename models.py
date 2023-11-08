@@ -1,4 +1,5 @@
 from sqlalchemy import  Column, Integer, String, Float
+from sqlalchemy.dialects.postgresql import JSONB 
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -15,7 +16,7 @@ class NewsFeed(Base):
     __tablename__ = "news_feed"
     id = Column(Integer, primary_key=True, index=True)
     Title=Column(String)
-    Description=Column(String)
+    Description=Column(JSONB)
     ShortDescription=Column(String)
     Category=Column(String)
     Image=Column(String)

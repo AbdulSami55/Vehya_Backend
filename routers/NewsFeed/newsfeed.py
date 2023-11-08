@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Optional
 from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile,File,status
@@ -18,10 +19,17 @@ router = APIRouter(
 
 
 @router.post("/create-news")
-async def create_news(Title: str = Form(...),Description: str = Form(...),Category: str = Form(...),ShortDescription: str = Form(...), Image: UploadFile=File(...), db: Session = Depends(get_db)):
+async def create_news(Title: str = Form(...),Section1:str = Form(...),Section2:str = Form(...),Section3:str = Form(...),Section4:str = Form(...),Category: str = Form(...),ShortDescription: str = Form(...), Image: UploadFile=File(...), db: Session = Depends(get_db)):
     try:
+        description = {
+            "Section1": Section1,
+            "Section2": Section2,
+            "Section3": Section3,
+            "Section4": Section4,
+        }
+
+       
         upload_image = crud.upload_image_file_test(file=Image, Category=Category)
-        description = crud.writeHTMLfile(data=Description)
         News = schemas.CompleteNewsFeed(Title=Title, Description=description, ShortDescription=ShortDescription, Category=Category, Image=upload_image)
         return crud.addNews(db=db,news=News)
         
@@ -168,9 +176,15 @@ async def get_Charging_article(PageNo:int,db:Session = Depends(get_db) ):
 
 
 @router.put('/Update-Article')
-async def updateNewsArticle(Id:int=Form(...),Title: str = Form(...),Description: str = Form(...),Category: str = Form(...),ShortDescription: str = Form(...),file:Optional[UploadFile]=None,db:Session = Depends(get_db) ):
+async def updateNewsArticle(Id:int=Form(...),Title: str = Form(...),Section1:str = Form(...),Section2:str = Form(...),Section3:str = Form(...),Section4:str = Form(...),Category: str = Form(...),ShortDescription: str = Form(...),file:Optional[UploadFile]=None,db:Session = Depends(get_db) ):
     try:
         article = db.query(models.NewsFeed).filter(models.NewsFeed.id==Id).first()
+        Description = {
+            "Section1": Section1,
+            "Section2": Section2,
+            "Section3": Section3,
+            "Section4": Section4,
+        }
         if article:
             if file is None:
                 # new_folder_name = crud.change_image_folder_name(old_name=article.Category, new_name=Article.category)
@@ -188,11 +202,11 @@ async def updateNewsArticle(Id:int=Form(...),Title: str = Form(...),Description:
                 if(Description==None):
                     description = article.Description
                 else:
-                    description = crud.writeHTMLfile(data=Description)
-                    if isinstance(description,str):
-                        os.remove(article.Description)
-                    else:
-                        return HTTPException(detail='Could not update Article',status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+                    description = Description
+                    # if isinstance(description,str):
+                    #     os.remove(article.Description)
+                    # else:
+                    #     return HTTPException(detail='Could not update Article',status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)    
                 image_file_name = os.path.basename(article.Image)
                 new_image_path = f'{new_folder_name}/Images/{image_file_name}'
                 updated_article = {
@@ -216,11 +230,11 @@ async def updateNewsArticle(Id:int=Form(...),Title: str = Form(...),Description:
                 if(Description==None):
                     description = article.Description
                 else:
-                    description = crud.writeHTMLfile(data=Description)
-                    if isinstance(description,str):
-                        os.remove(article.Description)
-                    else:
-                        return HTTPException(detail='Could not update Article',status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)   
+                    description = Description
+                    # if isinstance(description,str):
+                    #     os.remove(article.Description)
+                    # else:
+                    #     return HTTPException(detail='Could not update Article',status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)   
                 if isinstance(image_file, str):
                     updated_article = {
                         "id": Id,
@@ -250,7 +264,7 @@ async def deleteArticle(ArticleID:int, db:Session = Depends(get_db)):
     ArticleData= db.query(models.NewsFeed).filter(models.NewsFeed.id==ArticleID).first()
     if Article and ArticleData is not None :
         Article.delete(synchronize_session=False)
-        os.remove(ArticleData.Description)
+        # os.remove(ArticleData.Description)
         os.remove(ArticleData.Image)
         db.commit()
         return {'Message':'Article Deleted Successfully'}
