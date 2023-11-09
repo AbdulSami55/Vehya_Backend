@@ -19,7 +19,12 @@ router = APIRouter(
 
 
 @router.post("/create-news")
-async def create_news(Title: str = Form(...),Section1:str = Form(...),Section2:str = Form(...),Section3:str = Form(...),Section4:str = Form(...),Category: str = Form(...),ShortDescription: str = Form(...), Image: UploadFile=File(...), db: Session = Depends(get_db)):
+async def create_news(Title: str = Form(...), 
+    Section1: Optional[str] = Form(None),  
+    Section2: Optional[str] = Form(None),  
+    Section3: Optional[str] = Form(None),
+    Section4: Optional[str] = Form(None),
+    Category: str = Form(...),ShortDescription: str = Form(...), Image: UploadFile=File(...), db: Session = Depends(get_db)):
     try:
         description = {
             "Section1": Section1,
@@ -176,7 +181,12 @@ async def get_Charging_article(PageNo:int,db:Session = Depends(get_db) ):
 
 
 @router.put('/Update-Article')
-async def updateNewsArticle(Id:int=Form(...),Title: str = Form(...),Section1:str = Form(...),Section2:str = Form(...),Section3:str = Form(...),Section4:str = Form(...),Category: str = Form(...),ShortDescription: str = Form(...),file:Optional[UploadFile]=None,db:Session = Depends(get_db) ):
+async def updateNewsArticle(Id:int=Form(...),Title: str = Form(...)
+                            ,Section1: Optional[str] = Form(None),  
+                            Section2: Optional[str] = Form(None),  
+                            Section3: Optional[str] = Form(None),
+                            Section4: Optional[str] = Form(None)
+                            ,Category: str = Form(...),ShortDescription: str = Form(...),file:Optional[UploadFile]=None,db:Session = Depends(get_db) ):
     try:
         article = db.query(models.NewsFeed).filter(models.NewsFeed.id==Id).first()
         Description = {
