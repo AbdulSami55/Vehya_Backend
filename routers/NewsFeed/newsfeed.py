@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 import models
 from database import SessionLocal, engine, get_db
 import shutil
-from sqlalchemy import desc
+from sqlalchemy.orm import defer
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -72,9 +72,7 @@ async def get_news_article(PageNo:int,db:Session = Depends(get_db) ):
 @router.get('/Get-All-Articles')
 async def get_news_article(db:Session = Depends(get_db) ):
     try:
-        with db as session:
-            columns = [models.NewsFeed.id, models.NewsFeed.Category, models.NewsFeed.Image, models.NewsFeed.ShortDescription,models.NewsFeed.Title]
-            news = session.query(*columns).order_by(models.NewsFeed.id.desc()).all()
+        news = db.query(models.NewsFeed).options(defer(models.NewsFeed.Description)).order_by(models.NewsFeed.id.desc()).all()
         if news:
             return news, {'TotalRows':len(news)}
         else:
