@@ -2,12 +2,13 @@ import json
 import os
 from typing import Optional
 from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile,File,status
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from ..NewsFeed import schemas, crud
 from sqlalchemy.orm import Session
 import models
 from database import SessionLocal, engine, get_db
 import shutil
+from sqlalchemy import desc
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -32,7 +33,7 @@ async def create_news(Title: str = Form(...),
             "Section3": Section3,
             "Section4": Section4,
         }
-
+       
        
         upload_image = crud.upload_image_file_test(file=Image, Category=Category)
         News = schemas.CompleteNewsFeed(Title=Title, Description=description, ShortDescription=ShortDescription, Category=Category, Image=upload_image)
@@ -71,7 +72,9 @@ async def get_news_article(PageNo:int,db:Session = Depends(get_db) ):
 @router.get('/Get-All-Articles')
 async def get_news_article(db:Session = Depends(get_db) ):
     try:
-        news = db.query(models.NewsFeed).order_by(models.NewsFeed.id.desc()).all()
+        with db as session:
+            columns = [models.NewsFeed.id, models.NewsFeed.Category, models.NewsFeed.Image, models.NewsFeed.ShortDescription,models.NewsFeed.Title]
+            news = session.query(*columns).order_by(models.NewsFeed.id.desc()).all()
         if news:
             return news, {'TotalRows':len(news)}
         else:
@@ -189,12 +192,14 @@ async def updateNewsArticle(Id:int=Form(...),Title: str = Form(...)
                             ,Category: str = Form(...),ShortDescription: str = Form(...),file:Optional[UploadFile]=None,db:Session = Depends(get_db) ):
     try:
         article = db.query(models.NewsFeed).filter(models.NewsFeed.id==Id).first()
+
         Description = {
             "Section1": Section1,
             "Section2": Section2,
             "Section3": Section3,
             "Section4": Section4,
         }
+     
         if article:
             if file is None:
                 # new_folder_name = crud.change_image_folder_name(old_name=article.Category, new_name=Article.category)
@@ -267,7 +272,8 @@ async def updateNewsArticle(Id:int=Form(...),Title: str = Form(...)
         return HTTPException(detail='Something went wrong', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
-    
+
+
 @router.delete('/Delete-News-Article')
 async def deleteArticle(ArticleID:int, db:Session = Depends(get_db)):
     Article = db.query(models.NewsFeed).filter(models.NewsFeed.id==ArticleID)
