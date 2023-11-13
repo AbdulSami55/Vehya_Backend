@@ -139,15 +139,10 @@ async def DeleteVideo(VideoId:int,db:Session= Depends(get_db) ):
         return crud.deleteVideo(db=db, Id=VideoId)
     except:
         return HTTPException(detail='Something went wrong', status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+@router.get('/get-videos-by-page-number')
+async def getVideosByPageNumber(PageNo:int,db:Session = Depends(get_db)):
+    return crud.getVideosByPageNumber(PageNo=PageNo,db=db,page_description='home')
 
-
-# @router.get('/Get-Video-Stream')
-# async def getVideoStreamResponse(VideoId:int,db:Session= Depends(get_db)):
-#     try:
-#         video = db.query(models.Videos).filter(models.Videos.id==VideoId).first()
-#         if video:
-#             return crud.getVideoStream(video.Video)
-#         else:
-#             return {'Message':'No such data exists in database'}
-#     except:
-#         return HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+@router.get('/get-service-videos-by-page-number')
+async def getVideosByPageNumber(PageNo:int,db:Session = Depends(get_db)):
+    return crud.getVideosByPageNumber(PageNo=PageNo,db=db,page_description='service')

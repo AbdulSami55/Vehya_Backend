@@ -1,60 +1,45 @@
+import math
 from fastapi import HTTPException
 from fastapi.responses import StreamingResponse, JSONResponse
 from ..Videos import schemas
 import models
-import datetime
-import os
 from fastapi import status
 from sqlalchemy.orm import Session
-import shutil
 
-# def upload_thumbnail(file,video:schemas.Video):
-#     file_extension = file.filename.split(".")[-1]
-#     allowed_extensions = ["jpg", "jpeg", "png"]
-#     if file_extension.lower() in allowed_extensions:
-        
-    
-#         try:
-#             contents = file.file.read()
-#             current_time=datetime.datetime.now()
-#             current_time = current_time.strftime("%Y-%m-%d_%H-%M-%S")
-#             file_path=f'Static/Files/Video/{video.category}/Thumbnail/Images'
-#             if not os.path.exists(file_path):
-#                 os.makedirs(file_path)
-#             final_file_path=f'{file_path}/{current_time}__{file.filename}'
-#             with open(final_file_path, 'wb') as f:
-#                 f.write(contents)
-
-#         except Exception:
-#             os.remove(final_file_path)
-#             return HTTPException(detail="There was an error uploading the file",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-#         finally:
-#             file.file.close()
-#         return final_file_path
-#     else:
-#         return HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="File Type Invalid")
-    
-# def upload_video(file,video:schemas.Video):
-#     # Check if the uploaded file is a video (you can implement more detailed checks)
-#     if file.content_type.startswith("video/"):
-#        try: 
-#             # Create a directory to store uploaded videos (if it doesn't exist)
-#             current_time=datetime.datetime.now()
-#             current_time = current_time.strftime("%Y-%m-%d_%H-%M-%S")
-#             path = f'Static/Files/Video/{video.category}/Video'
-#             if not os.path.exists(path):
-#                 os.makedirs(path)
-#             final_path = f"{path}/{current_time}__{file.filename}"
-
-#             # Save the file to the "uploaded_videos" directory
-#             with open(final_path, "wb") as f:
-#                 shutil.copyfileobj(file.file, f) 
-#             return final_path
-#        except:  
-#             return HTTPException(detail="There was an error uploading the file",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
-         
-#     return HTTPException(status_code=status.HTTP_406_NOT_ACCEPTABLE, detail="File Type Invalid") 
-
+def getVideosByPageNumber(db:Session, PageNo:int,page_description:str):
+    end_index = PageNo*3
+    start_index = (end_index-3)
+    if page_description=='home':
+        total_rows =  db.query(models.Videos).filter(models.Videos.Category!='Charging').count()
+    else:
+        total_rows =  db.query(models.Videos).filter(models.Videos.Category=='Service PROs').count()
+    total_pages = (total_rows / 3 )
+    if total_pages % 1 > 0:
+        # Round up to the next whole number
+        total_pages_rounded = math.ceil(total_pages)
+    else:
+        # It's already a whole number
+        total_pages_rounded = int(total_pages)
+    Pages=list(range(1, int(total_pages)+2 ))
+    if (end_index>total_rows):
+        end_index=total_rows
+    if(start_index>end_index):
+        return HTTPException(detail='Page Does Not Exist', status_code=status.HTTP_404_NOT_FOUND)    
+    if page_description=='home':
+        videos = db.query(models.Videos).filter(models.Videos.Category!='Charging').order_by(models.Videos.id.desc()).slice(start=start_index, stop=end_index).all()
+    else:
+        videos = db.query(models.Videos).filter(models.Videos.Category=='Service PROs').order_by(models.Videos.id.desc()).slice(start=start_index, stop=end_index).all()
+    key=''
+    if(len(videos)==3):
+        key='continue'
+    else:
+        key='last'        
+    return {'PageNo':PageNo,
+            'Videos':videos,
+            'Key':key,
+            'TotalPages':total_pages_rounded,
+            'TotalData':total_rows
+            }    
 
 
 def addVideo(db:Session, video:schemas.CompleteVideo):

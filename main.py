@@ -28,4 +28,4 @@ def get_health():
     return {"status":"OK","code":200}
 
 if __name__=="__main__":
-    uvicorn.run(app,host='127.0.0.1',port=8000)
+    uvicorn.run(app,host='192.168.18.84',port=7000)
