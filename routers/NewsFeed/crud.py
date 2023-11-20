@@ -137,6 +137,22 @@ def getNews(db:Session, id:int):
             return {'Message':'No such data exists in database'}
     except:
         return HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+
+def getNewsbyTitle(db:Session, title:str):
+    try:
+        news = db.query(models.NewsFeed).filter(models.NewsFeed.Title==title).first()
+        if news:
+            return{
+                'Title':news.Title,
+                'Description':news.Description,
+                'ShortDescription':news.ShortDescription,
+                'Category':news.Category,
+                'Image':news.Image
+            }
+        else:
+            return {'Message':'No such data exists in database'}
+    except:
+        return HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)    
     
 
 def getNewsArticle(db:Session, PageNo:int):

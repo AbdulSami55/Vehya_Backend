@@ -53,6 +53,16 @@ async def get_news_by_id(NewsID:int, db:Session = Depends(get_db)):
         raise HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 
+@router.get('/get_news_by_TITLE')
+async def get_news_by_id(Title:str, db:Session = Depends(get_db)):
+    try:
+        Title = Title.replace('-',' ')
+        return crud.getNewsbyTitle(db=db, title=Title)
+
+    except:
+        raise HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
 @router.get('/Get-Article-By-Page-No')
 async def get_news_article(PageNo:int,db:Session = Depends(get_db) ):
     return crud.getNewsArticle(db=db, PageNo=PageNo)
