@@ -182,7 +182,7 @@ def getNewsArticle(db:Session, PageNo:int):
     if(start_index>end_index):
         return HTTPException(detail='Page Does Not Exist', status_code=status.HTTP_404_NOT_FOUND)    
     NewsArticles=[]
-    articles = db.query(models.NewsFeed).order_by(models.NewsFeed.id.desc()).slice(start=start_index, stop=end_index).all()
+    articles = db.query(models.NewsFeed).options(defer(models.NewsFeed.Description)).order_by(models.NewsFeed.id.desc()).slice(start=start_index, stop=end_index).all()
     for article in articles:
         NewsArticles.append(article)
     key=''

@@ -68,9 +68,9 @@ async def get_news_article(PageNo:int,db:Session = Depends(get_db) ):
     return crud.getNewsArticle(db=db, PageNo=PageNo)
 
 @router.get('/Get-All-Articles')
-async def get_news_article(db:Session = Depends(get_db) ):
+async def get_news_article(page_no:int,db:Session = Depends(get_db) ):
     try:
-        news = db.query(models.NewsFeed).options(defer(models.NewsFeed.Description)).order_by(models.NewsFeed.id.desc()).all()
+        news = crud.getNewsArticle(db=db, PageNo=page_no)
         if news:
             return news, {'TotalRows':len(news)}
         else:
