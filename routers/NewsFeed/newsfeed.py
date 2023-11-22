@@ -67,6 +67,21 @@ async def get_news_by_id(Title:str, db:Session = Depends(get_db)):
 async def get_news_article(PageNo:int,db:Session = Depends(get_db) ):
     return crud.getNewsArticle(db=db, PageNo=PageNo)
 
+
+
+
+@router.get('/Get-All-Articles-For-Search')
+async def get_news_article(db:Session = Depends(get_db) ):
+    try:
+        news = db.query(models.NewsFeed).options(defer(models.NewsFeed.Description)).all()
+        if news:
+            return news, {'TotalRows':len(news)}
+        else:
+            return {'Message':'No data exists'}
+    except:
+        return HTTPException(detail="Something Went Wrong",status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+
 @router.get('/Get-All-Articles')
 async def get_news_article(page_no:int,db:Session = Depends(get_db) ):
     try:
