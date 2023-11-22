@@ -6,6 +6,7 @@ import os
 from fastapi import status
 from sqlalchemy.orm import Session
 import math
+from sqlalchemy.orm import defer
 
 def upload_image_file(file,news:schemas.NewsFeed):
     file_extension = file.filename.split(".")[-1]
@@ -140,7 +141,16 @@ def getNews(db:Session, id:int):
 
 def getNewsbyTitle(db:Session, title:str):
     try:
-        news = db.query(models.NewsFeed).filter(models.NewsFeed.Title==title).first()
+        news = db.query(models.NewsFeed).options(defer(models.NewsFeed.Description)).all()
+        for i in news:
+            tmpTitle = i.Title.lower()
+            tmpTitle = tmpTitle.replace('-',' ')
+            if tmpTitle==title.lower():
+                news=i
+                break
+            else:
+                news=None
+
         if news:
             return{
                 'Title':news.Title,
