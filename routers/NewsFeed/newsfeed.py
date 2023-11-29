@@ -221,10 +221,13 @@ async def deleteArticle(ArticleID:int, db:Session = Depends(get_db)):
         return {'Message':'Article Deleted Successfully'}
     else:
         return HTTPException(detail='No News Article Found',status_code=status.HTTP_404_NOT_FOUND)  
+    
 
-@router.get('/image/{file_path}')
+@router.get('/image/{file_path:path}')
 def get_file(file_path: str):
-    return FileResponse(file_path)
+    # Combine the provided file path with the static root
+    full_path = f'Static/Files/NewsFeed/Charging/Images/{file_path}'
+    return FileResponse(full_path)
 
 
 @router.get('/Send-File-Response')
