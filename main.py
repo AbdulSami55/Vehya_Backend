@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 import uvicorn
@@ -24,8 +25,9 @@ app.add_middleware(
 )
 
 
-@app.get('/image/{file_path}')
-def get_file(file_path:str):
+@app.get('/image/{file_path:path}')
+def get_file(file_path: str):
+    # Use FileResponse as usual
     return FileResponse(file_path)
 
 
