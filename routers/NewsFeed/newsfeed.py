@@ -225,9 +225,20 @@ async def deleteArticle(ArticleID:int, db:Session = Depends(get_db)):
 
 @router.get('/image/{file_path:path}')
 def get_file(file_path: str):
-    # Combine the provided file path with the static root
-    full_path = f'Static/Files/NewsFeed/Charging/Images/{file_path}'
-    return FileResponse(full_path)
+    parent_folder = 'Static/Files/NewsFeed'
+    subfolders = ['Charging', 'Service PROs', 'Resiliency']
+
+    # Iterate over the subfolders
+    for subfolder in subfolders:
+        # Combine the provided file path with the static root and subfolder
+        full_path = os.path.join(parent_folder, subfolder, file_path)
+        # Check if the file exists
+        if os.path.isfile(full_path):
+            # If it does, return it
+            return FileResponse(full_path)
+
+    # If no file was found, return an error
+    return HTTPException(status_code=404, detail="File not found")
 
 
 @router.get('/Send-File-Response')
