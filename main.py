@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 from routers.NewsFeed import newsfeed
@@ -21,6 +22,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get('/{file_path}')
+def get_file(file_path:str):
+    return FileResponse(file_path)
 
 
 @app.get('/health')
