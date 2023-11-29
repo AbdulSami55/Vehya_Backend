@@ -24,7 +24,7 @@ app.add_middleware(
 )
 
 
-@app.get('/{file_path}')
+@app.get('/image/{file_path}')
 def get_file(file_path:str):
     return FileResponse(file_path)
 
