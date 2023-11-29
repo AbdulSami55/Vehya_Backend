@@ -19,6 +19,9 @@ router = APIRouter(
 
 
 
+
+
+
 @router.post("/create-news")
 async def create_news(Title: str = Form(...), 
     Section1: Optional[str] = Form(None),  
@@ -218,6 +221,10 @@ async def deleteArticle(ArticleID:int, db:Session = Depends(get_db)):
         return {'Message':'Article Deleted Successfully'}
     else:
         return HTTPException(detail='No News Article Found',status_code=status.HTTP_404_NOT_FOUND)  
+
+@router.get('/image/{file_path}')
+def get_file(file_path: str):
+    return FileResponse(file_path)
 
 
 @router.get('/Send-File-Response')
